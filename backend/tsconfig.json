@@ -10,7 +10,9 @@
     "forceConsistentCasingInFileNames": true,
     "moduleResolution": "node",
     "lib": ["es2017", "dom"],
-    "noImplicitAny": false
+    "noImplicitAny": false,
+    "typeRoots": ["./node_modules/@types", "./src/types.d.ts"],
+    "types": ["node", "express", "pg", "pdfkit", "cors"]
   },
   "include": ["src/**/*"],
   "exclude": ["node_modules"]

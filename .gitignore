@@ -59,6 +59,8 @@ jspm_packages/
 dist/
 build/
 public/
+# But keep frontend/public
+!frontend/public/
 
 # Editor directories and files
 .idea

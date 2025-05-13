@@ -13,11 +13,13 @@ import {
   Button,
   Grid,
   Autocomplete,
-  TextField
+  TextField,
+  CircularProgress
 } from '@mui/material';
 import { getFrequencyRatings, getYearsDistribution, getYearsDistributionForEstudiantes, getFeedbackDistribution, getScheduleDistributionForEstudiantes, getGradosEstudiantesDistribution, getScheduleDistributionForDocentes } from '../services/databaseService';
 import { FrequencyData } from '../types';
 import Spinner from './Spinner';
+import PDFGenerationSpinner from './PDFGenerationSpinner';
 import './FrequencyChart.css';
 import DownloadIcon from '@mui/icons-material/Download';
 import { config } from '../config';
@@ -36,6 +38,7 @@ export const FrequencyChart: React.FC = () => {
   const [acudientesGradesData, setAcudientesGradesData] = useState<BarChartData[]>([]);
   const [docentesScheduleData, setDocentesScheduleData] = useState<BarChartData[]>([]);
   const [loading, setLoading] = useState(true);
+  const [generatingAllPDFs, setGeneratingAllPDFs] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [schools, setSchools] = useState<string[]>([]);
   const [selectedSchool, setSelectedSchool] = useState<string>('');
@@ -270,7 +273,7 @@ export const FrequencyChart: React.FC = () => {
   // Add a function to handle generating all PDFs
   const handleGenerateAllPDFs = async () => {
     try {
-      setLoading(true);
+      setGeneratingAllPDFs(true);
       console.log('Starting all PDFs generation process');
       const apiUrl = `${config.api.baseUrl}/api/generate-all-pdfs`;
       console.log('API URL:', apiUrl);
@@ -319,11 +322,11 @@ export const FrequencyChart: React.FC = () => {
       // Clean up the URL
       window.URL.revokeObjectURL(url);
       console.log('Download process completed');
-      setLoading(false);
+      setGeneratingAllPDFs(false);
     } catch (err) {
       console.error('Error downloading all PDFs:', err);
       setError('Error al generar todos los PDFs');
-      setLoading(false);
+      setGeneratingAllPDFs(false);
     }
   };
 
@@ -411,10 +414,15 @@ export const FrequencyChart: React.FC = () => {
             variant="contained" 
             color="secondary" 
             onClick={handleGenerateAllPDFs}
-            disabled={loading}
-            startIcon={<DownloadIcon />}
+            disabled={loading || generatingAllPDFs}
+            startIcon={!generatingAllPDFs ? <DownloadIcon /> : undefined}
+            sx={{ 
+              minWidth: generatingAllPDFs ? '200px' : '180px',
+              transition: 'all 0.3s ease',
+              position: 'relative'
+            }}
           >
-            Generar todos los PDFs
+            {generatingAllPDFs ? <PDFGenerationSpinner /> : 'Generar todos los PDFs'}
           </Button>
         </Box>
       </Box>

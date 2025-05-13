@@ -4,7 +4,7 @@ services:
     name: cosmo-stats-backend
     env: node
     plan: free
-    buildCommand: cd backend && npm install && npm install --save-dev @types/node && tsc --skipLibCheck --noImplicitThis false --resolveJsonModule --allowSyntheticDefaultImports && mkdir -p dist/images && cp -R ../frontend/public/images/* dist/images/
+    buildCommand: cd backend && npm install && npm install --save-dev @types/node && node --require ts-node/register --max-old-space-size=4096 node_modules/.bin/typescript -p tsconfig.json --skipLibCheck --typeCheck false && mkdir -p dist/images && cp -R ../frontend/public/images/* dist/images/
     startCommand: cd backend && NODE_ENV=production node dist/server.js
     envVars:
       - key: NODE_ENV

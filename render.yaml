@@ -4,7 +4,7 @@ services:
     name: cosmo-stats-backend
     env: node
     plan: free
-    buildCommand: cd backend && npm install && npm install --save-dev @types/node && echo "console.log('Skipping TypeScript build due to type errors');" > build-skip.js && node build-skip.js && mkdir -p dist && cp -r src/* dist/ && mkdir -p dist/images && mkdir -p dist/pdf-output && mkdir -p dist/pdf-modules && cp -R ../frontend/public/images/* dist/images/ && cp src/pdf-modules/pdfHelpers.js dist/pdf-modules/
+    buildCommand: cd backend && npm install ts-node && node build-render.js
     startCommand: cd backend && NODE_ENV=production node dist/server.js
     envVars:
       - key: NODE_ENV

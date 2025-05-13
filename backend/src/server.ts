@@ -1417,6 +1417,60 @@ async function getScheduleDistributionForEstudiantes(school: string): Promise<Pi
   }
 } 
 
+// Helper function to ensure directory exists
+async function ensureDirectoryExists(dirPath: string): Promise<void> {
+  try {
+    await fs.promises.mkdir(dirPath, { recursive: true });
+    console.log(`Created directory: ${dirPath}`);
+  } catch (error) {
+    console.error(`Error creating directory ${dirPath}:`, error);
+    throw error;
+  }
+}
+
+// Helper function to clear directory contents
+async function clearDirectory(dirPath: string): Promise<void> {
+  try {
+    // Check if directory exists first
+    try {
+      await fs.promises.access(dirPath);
+    } catch (err) {
+      // If directory doesn't exist, create it and return
+      await ensureDirectoryExists(dirPath);
+      return;
+    }
+    
+    // Read directory contents
+    const entries = await fs.promises.readdir(dirPath, { withFileTypes: true });
+    
+    // Delete each entry (file or directory)
+    for (const entry of entries) {
+      const entryPath = path.join(dirPath, entry.name);
+      
+      if (entry.isDirectory()) {
+        // Recursively clear and remove directory
+        await clearDirectory(entryPath);
+        await fs.promises.rmdir(entryPath);
+        console.log(`Removed directory: ${entryPath}`);
+      } else {
+        // Remove file
+        await fs.promises.unlink(entryPath);
+        console.log(`Removed file: ${entryPath}`);
+      }
+    }
+    
+    console.log(`Cleared directory: ${dirPath}`);
+  } catch (error) {
+    console.error(`Error clearing directory ${dirPath}:`, error);
+    throw error;
+  }
+}
+
+// Helper function to sanitize file names
+function sanitizeFileName(name: string): string {
+  return name.replace(/[^a-z0-9áéíóúüñÁÉÍÓÚÜÑ]/gi, '_').trim();
+}
+
 // Add a new endpoint to generate PDFs for all schools
 app.get('/api/generate-all-pdfs', async (req, res) => {
   try {
@@ -1453,7 +1507,10 @@ app.get('/api/generate-all-pdfs', async (req, res) => {
     
     // Create base output directory
     const baseOutputDir = path.join(__dirname, 'pdf-output');
-    await ensureDirectoryExists(baseOutputDir);
+    
+    // Clear all existing files and directories in the pdf-output folder
+    console.log('Clearing pdf-output directory before generating new PDFs...');
+    await clearDirectory(baseOutputDir);
     
     // Track created directories to avoid duplicate creation attempts
     const createdDirs = new Set<string>();
@@ -2604,19 +2661,3 @@ app.get('/api/schools-ranking', async (req, res) => {
     });
   }
 }); 
-
-// Helper function to ensure directory exists
-async function ensureDirectoryExists(dirPath: string): Promise<void> {
-  try {
-    await fs.promises.mkdir(dirPath, { recursive: true });
-    console.log(`Created directory: ${dirPath}`);
-  } catch (error) {
-    console.error(`Error creating directory ${dirPath}:`, error);
-    throw error;
-  }
-}
-
-// Helper function to sanitize file names
-function sanitizeFileName(name: string): string {
-  return name.replace(/[^a-z0-9áéíóúüñÁÉÍÓÚÜÑ]/gi, '_').trim();
-}

@@ -5,7 +5,8 @@ import { FrequencyData, SectionConfig, GridItem, FrequencyResult } from './types
 import { QueryResult } from 'pg';
 import PDFKit from 'pdfkit';
 import path from 'path';
-import fs from 'fs';
+import * as fs from 'fs';
+import { promises as fsPromises } from 'fs';
 import { generatePDF } from './pdf-modules/pdfGenerator';
 import { config } from './config';
 
@@ -1420,7 +1421,7 @@ async function getScheduleDistributionForEstudiantes(school: string): Promise<Pi
 // Helper function to ensure directory exists
 async function ensureDirectoryExists(dirPath: string): Promise<void> {
   try {
-    await fs.promises.mkdir(dirPath, { recursive: true });
+    await fsPromises.mkdir(dirPath, { recursive: true });
     console.log(`Created directory: ${dirPath}`);
   } catch (error) {
     console.error(`Error creating directory ${dirPath}:`, error);
@@ -1433,7 +1434,7 @@ async function clearDirectory(dirPath: string): Promise<void> {
   try {
     // Check if directory exists first
     try {
-      await fs.promises.access(dirPath);
+      await fsPromises.access(dirPath);
     } catch (err) {
       // If directory doesn't exist, create it and return
       await ensureDirectoryExists(dirPath);
@@ -1441,7 +1442,7 @@ async function clearDirectory(dirPath: string): Promise<void> {
     }
     
     // Read directory contents
-    const entries = await fs.promises.readdir(dirPath, { withFileTypes: true });
+    const entries = await fsPromises.readdir(dirPath, { withFileTypes: true });
     
     // Delete each entry (file or directory)
     for (const entry of entries) {
@@ -1450,11 +1451,11 @@ async function clearDirectory(dirPath: string): Promise<void> {
       if (entry.isDirectory()) {
         // Recursively clear and remove directory
         await clearDirectory(entryPath);
-        await fs.promises.rmdir(entryPath);
+        await fsPromises.rmdir(entryPath);
         console.log(`Removed directory: ${entryPath}`);
       } else {
         // Remove file
-        await fs.promises.unlink(entryPath);
+        await fsPromises.unlink(entryPath);
         console.log(`Removed file: ${entryPath}`);
       }
     }

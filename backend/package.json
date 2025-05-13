@@ -4,7 +4,7 @@
   "description": "COSMO Stats Backend",
   "main": "dist/server.js",
   "scripts": {
-    "build": "tsc --skipLibCheck --noImplicitThis false && mkdir -p dist/images && mkdir -p dist/pdf-output && cp -R ../frontend/public/images/* dist/images/ && cp src/pdf-modules/pdfHelpers.js dist/pdf-modules/",
+    "build": "tsc --skipLibCheck --noImplicitThis false --noEmitOnError false && mkdir -p dist/images && mkdir -p dist/pdf-output && mkdir -p dist/pdf-modules && cp -R ../frontend/public/images/* dist/images/ && cp src/pdf-modules/pdfHelpers.js dist/pdf-modules/",
     "deployBuild": "ts-node-dev --transpileOnly src/server.ts --sourceMap false --outDir dist && mkdir -p dist/images && cp -R ../frontend/public/images/* dist/images/",
     "start": "node dist/server.js",
     "dev": "NODE_ENV=development ts-node-dev --respawn --transpile-only src/server.ts",

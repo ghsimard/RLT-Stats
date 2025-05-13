@@ -51,6 +51,9 @@ declare module 'pdfkit' {
       indent?: number;
       lineGap?: number;
       continued?: boolean;
+      underline?: boolean;
+      baseline?: string;
+      lineBreak?: boolean;
     }
     interface ImageOption {
       scale?: number;

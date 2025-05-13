@@ -27,6 +27,10 @@ declare module 'pdfkit' {
     dash(length?: number, options?: { space?: number }): this;
     lineWidth(width: number): this;
     
+    // Methods that need specific argument handling
+    circle(...args: any[]): this;
+    underline(...args: any[]): this;
+    
     // Document structure
     addPage(options?: PDFKit.PDFDocumentOptions): this;
   }
@@ -54,6 +58,18 @@ declare module 'pdfkit' {
       underline?: boolean;
       baseline?: string;
       lineBreak?: boolean;
+      // Additional properties
+      stroke?: boolean;
+      oblique?: boolean;
+      fill?: boolean;
+      destination?: string;
+      goTo?: string;
+      wordSpacing?: number;
+      characterSpacing?: number;
+      features?: string[];
+      paragraphGap?: number;
+      link?: string;
+      color?: string;
     }
     interface ImageOption {
       scale?: number;
@@ -94,4 +110,8 @@ export interface CustomPDFKit extends PDFKit.PDFDocument {
   rotate(angle: number, options?: { origin?: [number, number] }): this;
   dash(length?: number, options?: { space?: number }): this;
   lineWidth(width: number): this;
+  
+  // Methods that need specific argument handling
+  circle(...args: any[]): this;
+  underline(...args: any[]): this;
 } 

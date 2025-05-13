@@ -17,8 +17,9 @@ env.development
 env.production
 
 # Local configuration
-public/api-config.js
-frontend/public/api-config.js
+# DO NOT EXCLUDE THESE CONFIGS - NEEDED FOR RENDER.COM BUILDS
+# public/api-config.js
+# frontend/public/api-config.js
 
 # Testing
 /coverage/
@@ -108,9 +109,6 @@ jspm_packages/
 
 # Excel temp files
 ~$*
-
-# Frontend specific
-public/
 
 # Backend specific
 backend/public/

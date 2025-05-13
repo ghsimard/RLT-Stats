@@ -246,10 +246,10 @@ export const FrequencyChart: React.FC = () => {
       const url = window.URL.createObjectURL(blob);
       console.log('URL created:', url);
       
-      // Create a temporary link element
+      // Create a temporary link element with the new filename format
       const link = document.createElement('a');
       link.href = url;
-      link.download = `frequency-report${selectedSchool ? `-${selectedSchool}` : ''}.pdf`;
+      link.download = `RLT-Informe de Encuesta-${selectedSchool}.pdf`;
       console.log('Link created with attributes:', {
         href: link.href,
         download: link.download
@@ -307,7 +307,7 @@ export const FrequencyChart: React.FC = () => {
       // Create a temporary link element
       const link = document.createElement('a');
       link.href = url;
-      link.download = 'all-frequency-reports.zip';
+      link.download = 'RLT - Informes de Encuestas.zip';
       console.log('Link created with attributes:', {
         href: link.href,
         download: link.download

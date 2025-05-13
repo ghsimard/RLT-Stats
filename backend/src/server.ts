@@ -5,6 +5,7 @@ import { FrequencyData, SectionConfig, GridItem, FrequencyResult } from './types
 import { QueryResult } from 'pg';
 import PDFKit from 'pdfkit';
 import path from 'path';
+import fs from 'fs';
 import { generatePDF } from './pdf-modules/pdfGenerator';
 import { config } from './config';
 
@@ -593,18 +594,44 @@ app.get('/api/generate-pdf', async (req, res) => {
       });
     }
 
-    // Set response headers
-    res.setHeader('Content-Type', 'application/pdf');
-    res.setHeader('Content-Disposition', `attachment; filename=frequency-report-${encodeURIComponent(school)}.pdf`);
+    // Get the entidad_territorial for this school
+    const entidadTerritorial = await getEntidadTerritorial(school);
+    const sanitizedSchoolName = sanitizeFileName(school);
+    const sanitizedEntidad = sanitizeFileName(entidadTerritorial);
     
-    // Generate PDF document using the new modular approach
+    // Create output directory structure if it doesn't exist
+    const outputDir = path.join(__dirname, 'pdf-output', sanitizedEntidad);
+    await ensureDirectoryExists(outputDir);
+    
+    // File path for saving the PDF - just use the school name as requested
+    const pdfFilePath = path.join(outputDir, `${sanitizedSchoolName}.pdf`);
+    
+    // Generate PDF document using the modular approach
     const doc = await generatePDF(school);
     
-    // Pipe the PDF to the response
+    // Create a write stream to save the PDF locally
+    const writeStream = fs.createWriteStream(pdfFilePath);
+    doc.pipe(writeStream);
+    
+    // Also pipe to the response for immediate download, use just the school name as filename
+    res.setHeader('Content-Type', 'application/pdf');
+    res.setHeader('Content-Disposition', `attachment; filename=${sanitizedSchoolName}.pdf`);
     doc.pipe(res);
     
     // Finalize the PDF
     doc.end();
+    
+    // Wait for the file to be saved
+    await new Promise<void>((resolve, reject) => {
+      writeStream.on('finish', () => {
+        console.log(`PDF saved to ${pdfFilePath}`);
+        resolve();
+      });
+      writeStream.on('error', (err) => {
+        console.error(`Error saving PDF to ${pdfFilePath}:`, err);
+        reject(err);
+      });
+    });
   } catch (error) {
     console.error('Error generating PDF:', error);
     res.status(500).json({ 
@@ -1393,25 +1420,28 @@ async function getScheduleDistributionForEstudiantes(school: string): Promise<Pi
 // Add a new endpoint to generate PDFs for all schools
 app.get('/api/generate-all-pdfs', async (req, res) => {
   try {
-    // Get the list of all schools
+    // Get the list of all schools with their entidad_territorial
     const schoolsQuery = `
       SELECT DISTINCT 
-        "nombre_de_la_institucion_educativa_en_la_actualmente_desempena_" as school_name
+        "nombre_de_la_institucion_educativa_en_la_actualmente_desempena_" as school_name,
+        entidad_territorial
       FROM rectores
-      ORDER BY school_name
+      WHERE "nombre_de_la_institucion_educativa_en_la_actualmente_desempena_" IS NOT NULL
+        AND "nombre_de_la_institucion_educativa_en_la_actualmente_desempena_" != ''
+      ORDER BY entidad_territorial, school_name
     `;
     
     const schoolsResult = await pool.query(schoolsQuery);
-    const schools = schoolsResult.rows.map(row => row.school_name);
+    const schools = schoolsResult.rows;
     
-    console.log(`Generating PDFs for ${schools.length} schools`);
+    console.log(`Generating PDFs for ${schools.length} schools across multiple entidades territoriales`);
     
     // Create a zip file to contain all PDFs
     const archiver = require('archiver');
     
-    // Set response headers for a zip file
+    // Set response headers for a zip file with the requested name
     res.setHeader('Content-Type', 'application/zip');
-    res.setHeader('Content-Disposition', 'attachment; filename=all-frequency-reports.zip');
+    res.setHeader('Content-Disposition', 'attachment; filename=RLT - Informes de Encuestas.zip');
     
     // Create a zip archive
     const archive = archiver('zip', {
@@ -1421,13 +1451,40 @@ app.get('/api/generate-all-pdfs', async (req, res) => {
     // Pipe the archive to the response
     archive.pipe(res);
     
+    // Create base output directory
+    const baseOutputDir = path.join(__dirname, 'pdf-output');
+    await ensureDirectoryExists(baseOutputDir);
+    
+    // Track created directories to avoid duplicate creation attempts
+    const createdDirs = new Set<string>();
+    
     // Generate a PDF for each school and add it to the archive
-    for (const school of schools) {
+    for (const { school_name: school, entidad_territorial } of schools) {
       try {
-        console.log(`Generating PDF for school: ${school}`);
+        console.log(`[${entidad_territorial}] Generating PDF for school: ${school}`);
+        
+        // Sanitize names for file system
+        const sanitizedSchoolName = sanitizeFileName(school);
+        const sanitizedEntidad = sanitizeFileName(entidad_territorial || 'No_especificada');
+        
+        // Create directory for this entidad_territorial if it doesn't exist
+        const entidadDir = path.join(baseOutputDir, sanitizedEntidad);
+        if (!createdDirs.has(sanitizedEntidad)) {
+          await ensureDirectoryExists(entidadDir);
+          createdDirs.add(sanitizedEntidad);
+        }
+        
+        // File path for the PDF - just use the school name
+        const pdfFilePath = path.join(entidadDir, `${sanitizedSchoolName}.pdf`);
+        
+        // Generate the PDF document
         const doc = await generatePDF(school);
         
-        // Convert PDF to a buffer
+        // Save the PDF to disk first
+        const writeStream = fs.createWriteStream(pdfFilePath);
+        doc.pipe(writeStream);
+        
+        // Convert PDF to a buffer for the archive
         const chunks: Buffer[] = [];
         doc.on('data', (chunk) => chunks.push(chunk));
         
@@ -1435,16 +1492,26 @@ app.get('/api/generate-all-pdfs', async (req, res) => {
         await new Promise<void>((resolve, reject) => {
           doc.on('end', () => {
             const pdfBuffer = Buffer.concat(chunks);
-            const safeSchoolName = school.replace(/[^a-z0-9]/gi, '_').toLowerCase();
             
-            // Add the PDF to the archive
-            archive.append(pdfBuffer, { name: `frequency-report-${safeSchoolName}.pdf` });
-            console.log(`Added ${school} PDF to archive`);
+            // Add the PDF to the archive with path structure preserved
+            // Use 'RLT - Informes de Encuestas' as the root folder name
+            const archivePath = `RLT - Informes de Encuestas/${sanitizedEntidad}/${sanitizedSchoolName}.pdf`;
+            archive.append(pdfBuffer, { name: archivePath });
+            console.log(`Added ${school} PDF to archive at ${archivePath}`);
             resolve();
+          });
+          
+          writeStream.on('finish', () => {
+            console.log(`PDF saved to ${pdfFilePath}`);
           });
           
           doc.on('error', (err) => {
             console.error(`Error generating PDF for school ${school}:`, err);
+            reject(err);
+          });
+          
+          writeStream.on('error', (err) => {
+            console.error(`Error writing PDF for school ${school}:`, err);
             reject(err);
           });
           
@@ -2537,3 +2604,19 @@ app.get('/api/schools-ranking', async (req, res) => {
     });
   }
 }); 
+
+// Helper function to ensure directory exists
+async function ensureDirectoryExists(dirPath: string): Promise<void> {
+  try {
+    await fs.promises.mkdir(dirPath, { recursive: true });
+    console.log(`Created directory: ${dirPath}`);
+  } catch (error) {
+    console.error(`Error creating directory ${dirPath}:`, error);
+    throw error;
+  }
+}
+
+// Helper function to sanitize file names
+function sanitizeFileName(name: string): string {
+  return name.replace(/[^a-z0-9áéíóúüñÁÉÍÓÚÜÑ]/gi, '_').trim();
+}

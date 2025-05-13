@@ -4,7 +4,7 @@
   "description": "COSMO Stats Backend",
   "main": "dist/server.js",
   "scripts": {
-    "build": "tsc --skipLibCheck --noImplicitThis false --noStrictGenericChecks && mkdir -p dist/images && cp -R ../frontend/public/images/* dist/images/",
+    "build": "tsc --skipLibCheck --noImplicitThis false && mkdir -p dist/images && cp -R ../frontend/public/images/* dist/images/",
     "deployBuild": "ts-node-dev --transpileOnly src/server.ts --sourceMap false --outDir dist && mkdir -p dist/images && cp -R ../frontend/public/images/* dist/images/",
     "start": "node dist/server.js",
     "dev": "NODE_ENV=development ts-node-dev --respawn --transpile-only src/server.ts",

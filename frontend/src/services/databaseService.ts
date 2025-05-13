@@ -2,6 +2,16 @@ import { config } from '../config';
 import { FrequencyData } from '../types';
 import { BarChartData } from '../components/BarChart';
 
+// Define common fetch options to handle CORS
+const fetchOptions = {
+  method: 'GET',
+  headers: {
+    'Content-Type': 'application/json',
+    'Accept': 'application/json'
+  },
+  mode: 'cors' as RequestMode
+};
+
 export const getFrequencyRatings = async (school?: string): Promise<FrequencyData[]> => {
   try {
     const url = school 
@@ -10,7 +20,7 @@ export const getFrequencyRatings = async (school?: string): Promise<FrequencyDat
     
     console.log('Fetching frequency ratings from:', url);
     
-    const response = await fetch(url);
+    const response = await fetch(url, fetchOptions);
     if (!response.ok) {
       throw new Error(`Failed to fetch data: ${response.status} ${response.statusText}`);
     }
@@ -29,7 +39,7 @@ export const getYearsDistribution = async (school: string): Promise<BarChartData
     
     console.log('Fetching years distribution from:', url);
     
-    const response = await fetch(url);
+    const response = await fetch(url, fetchOptions);
     if (!response.ok) {
       throw new Error(`Failed to fetch data: ${response.status} ${response.statusText}`);
     }
@@ -48,7 +58,7 @@ export const getYearsDistributionForEstudiantes = async (school: string): Promis
     
     console.log('Fetching estudiantes years distribution from:', url);
     
-    const response = await fetch(url);
+    const response = await fetch(url, fetchOptions);
     if (!response.ok) {
       throw new Error(`Failed to fetch data: ${response.status} ${response.statusText}`);
     }
@@ -67,7 +77,7 @@ export const getFeedbackDistribution = async (school: string): Promise<BarChartD
     
     console.log('Fetching feedback distribution from:', url);
     
-    const response = await fetch(url);
+    const response = await fetch(url, fetchOptions);
     if (!response.ok) {
       throw new Error(`Failed to fetch data: ${response.status} ${response.statusText}`);
     }
@@ -86,7 +96,7 @@ export const getScheduleDistributionForEstudiantes = async (school: string): Pro
     
     console.log('Fetching estudiantes schedule distribution from:', url);
     
-    const response = await fetch(url);
+    const response = await fetch(url, fetchOptions);
     if (!response.ok) {
       throw new Error(`Failed to fetch data: ${response.status} ${response.statusText}`);
     }
@@ -105,7 +115,7 @@ export const getGradosEstudiantesDistribution = async (school: string): Promise<
     
     console.log('Fetching acudientes grades distribution from:', url);
     
-    const response = await fetch(url);
+    const response = await fetch(url, fetchOptions);
     if (!response.ok) {
       throw new Error(`Failed to fetch data: ${response.status} ${response.statusText}`);
     }
@@ -124,7 +134,7 @@ export const getScheduleDistributionForDocentes = async (school: string): Promis
     
     console.log('Fetching docentes schedule distribution from:', url);
     
-    const response = await fetch(url);
+    const response = await fetch(url, fetchOptions);
     if (!response.ok) {
       throw new Error(`Failed to fetch data: ${response.status} ${response.statusText}`);
     }
@@ -163,7 +173,7 @@ export const getSchoolRankings = async (): Promise<SchoolRanking[]> => {
     
     console.log('Fetching school rankings from:', url);
     
-    const response = await fetch(url);
+    const response = await fetch(url, fetchOptions);
     if (!response.ok) {
       throw new Error(`Failed to fetch rankings: ${response.status} ${response.statusText}`);
     }

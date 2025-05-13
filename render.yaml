@@ -14,13 +14,13 @@ services:
       - key: DB_CONNECTION_STRING
         value: postgresql://cosmo_rlt_user:BpG7RWIjipwdYQMKjXYRua4TcpYffwPL@dpg-d054t79r0fns73d2loeg-a/cosmo_rlt
       - key: CORS_ORIGINS
-        value: https://cosmo-stats-frontend.onrender.com
+        value: https://cosmo-stats-frontend.onrender.com,https://cosmo-stats-backend.onrender.com
 
   # Frontend Static Site
   - type: static
     name: cosmo-stats-frontend
     env: static
-    buildCommand: cd frontend && npm install && npm run build
+    buildCommand: cd frontend && npm install && NODE_ENV=production npm run build
     staticPublishPath: ./frontend/build
     headers:
       - path: /*

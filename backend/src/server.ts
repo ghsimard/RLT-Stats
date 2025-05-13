@@ -11,24 +11,40 @@ import { config } from './config';
 const app = express();
 const port = config.ports.backend;
 
+// Set up CORS with a more permissive configuration
 app.use(cors({
   origin: function(origin, callback) {
-    // Allow requests with no origin (like mobile apps or curl requests)
-    if (!origin) return callback(null, true);
+    // In development or when no origin is provided (like Postman or curl), allow all
+    if (!origin || process.env.NODE_ENV !== 'production') {
+      return callback(null, true);
+    }
     
-    const allowedOrigins = Array.isArray(config.cors.origin) 
-      ? config.cors.origin 
-      : [config.cors.origin];
+    // Define allowed origins including Render domains
+    const allowedOrigins = [
+      'https://cosmo-stats-frontend.onrender.com',
+      'https://cosmo-stats-backend.onrender.com'
+    ];
     
-    if (allowedOrigins.indexOf(origin) !== -1) {
+    // Add origins from config if available
+    if (Array.isArray(config.cors.origin)) {
+      allowedOrigins.push(...config.cors.origin);
+    } else if (typeof config.cors.origin === 'string') {
+      allowedOrigins.push(config.cors.origin);
+    }
+    
+    // Check if the request origin is allowed
+    if (allowedOrigins.indexOf(origin) !== -1 || origin.endsWith('.onrender.com')) {
       callback(null, true);
     } else {
       console.log(`Origin ${origin} not allowed by CORS`);
-      callback(null, allowedOrigins[0]); // Allow the first origin as fallback
+      callback(null, true); // Allow anyway for now to troubleshoot
     }
   },
-  credentials: true // Allow credentials (cookies, authorization headers)
+  credentials: true,
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization']
 }));
+
 app.use(express.json());
 
 // Serve static files from the images directory

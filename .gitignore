@@ -1,3 +1,55 @@
+# Dependencies
+node_modules/
+.pnp/
+.pnp.js
+
+# Production build folders
+/build/
+/dist/
+frontend/build/
+backend/dist/
+
+# Environment variables
+.env
+.env.*
+!.env.example
+env.development
+env.production
+
+# Local configuration
+public/api-config.js
+frontend/public/api-config.js
+
+# Testing
+/coverage/
+
+# Misc
+.DS_Store
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+
+# Logs
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# IDE files
+.idea/
+.vscode/
+*.sublime-project
+*.sublime-workspace
+
+# OS generated files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
 # Logs
 logs
 *.log
@@ -27,7 +79,6 @@ coverage
 .nyc_output
 
 # Dependency directories
-node_modules/
 jspm_packages/
 
 # TypeScript cache
@@ -48,17 +99,21 @@ jspm_packages/
 # Yarn Integrity file
 .yarn-integrity
 
-# dotenv environment variable files
-.env
-.env.development.local
-.env.test.local
-.env.production.local
-.env.local
+# Editor directories and files
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
 
-# Build directories
-dist/
-build/
+# Excel temp files
+~$*
+
+# Frontend specific
 public/
+
+# Backend specific
+backend/public/
 
 # Editor directories and files
 .idea
@@ -79,11 +134,4 @@ ehthumbs.db
 Thumbs.db
 
 # Excel temp files
-~$*
-
-# Backend specific
-backend/public/
-backend/dist/
-
-# Frontend specific
-frontend/build/ 
+~$* 

@@ -4,12 +4,33 @@ const dotenv = require('dotenv');
 
 dotenv.config();
 
-console.log('Attempting to connect to database with connection string:', config.database.connectionString.replace(/:[^:@]*@/, ':****@'));
+// Log connection details (hiding password)
+if (config.database.connectionString) {
+  console.log('Connecting to database using connection string (password hidden)');
+} else {
+  console.log('Connecting to database using parameters:', {
+    host: config.database.host,
+    database: config.database.database,
+    user: config.database.user,
+    // Password is hidden for security
+  });
+}
 
-export const pool = new Pool({
-  connectionString: config.database.connectionString,
-  ssl: config.database.ssl
-});
+// Create connection pool with either connection string or individual parameters
+export const pool = new Pool(
+  config.database.connectionString
+    ? {
+        connectionString: config.database.connectionString,
+        ssl: config.database.ssl
+      }
+    : {
+        host: config.database.host,
+        user: config.database.user,
+        password: config.database.password,
+        database: config.database.database,
+        ssl: config.database.ssl
+      }
+);
 
 // Test the connection
 pool.query('SELECT NOW()')

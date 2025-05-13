@@ -6,7 +6,7 @@
   "scripts": {
     "build": "tsc && mkdir -p dist/images && cp -R ../frontend/public/images/* dist/images/",
     "start": "node dist/server.js",
-    "dev": "ts-node-dev --respawn --transpile-only src/server.ts",
+    "dev": "NODE_ENV=development ts-node-dev --respawn --transpile-only src/server.ts",
     "test": "jest"
   },
   "keywords": [],
@@ -28,5 +28,8 @@
     "@types/pg": "^8.6.6",
     "ts-node-dev": "^2.0.0",
     "typescript": "^5.0.4"
+  },
+  "engines": {
+    "node": ">=16.0.0"
   }
 }

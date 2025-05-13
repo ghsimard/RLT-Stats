@@ -5,7 +5,6 @@ import { Dashboard } from './components/Dashboard';
 import { FrequencyChart } from './components/FrequencyChart';
 import { MonitoringSurvey } from './components/MonitoringSurvey';
 import { Navigation } from './components/Navigation';
-import { config } from './config';
 
 const theme = createTheme({
   palette: {

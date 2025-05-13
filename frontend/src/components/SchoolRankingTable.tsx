@@ -65,14 +65,6 @@ export const SchoolRankingTable: React.FC<SchoolRankingTableProps> = ({ classNam
     );
   }
 
-  const getScoreColor = (score: number): string => {
-    if (score >= 3.5) return '#388e3c'; // Green
-    if (score >= 3) return '#689f38'; // Light Green
-    if (score >= 2.5) return '#ffa000'; // Amber
-    if (score >= 2) return '#f57c00'; // Orange
-    return '#d32f2f'; // Red
-  };
-
   const getScoreChipColor = (score: number): 'success' | 'warning' | 'error' | 'default' => {
     if (score >= 3.5) return 'success'; // Green
     if (score >= 2.5) return 'warning'; // Warning/Yellow

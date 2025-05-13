@@ -31,6 +31,11 @@ declare module 'pdfkit' {
     circle(...args: any[]): this;
     underline(...args: any[]): this;
     
+    // Methods from fortalezasPages.ts that are causing issues (line 460 and 649)
+    circle(x: number, y: number, radius: number): this;
+    underline(x: number, y: number, x2: number, y2: number, options?: any): this;
+    underline(test: string): this;
+    
     // Document structure
     addPage(options?: PDFKit.PDFDocumentOptions): this;
   }
@@ -114,4 +119,9 @@ export interface CustomPDFKit extends PDFKit.PDFDocument {
   // Methods that need specific argument handling
   circle(...args: any[]): this;
   underline(...args: any[]): this;
+  
+  // Methods from fortalezasPages.ts that are causing issues (line 460 and 649)
+  circle(x: number, y: number, radius: number): this;
+  underline(x: number, y: number, x2: number, y2: number, options?: any): this;
+  underline(test: string): this;
 } 

@@ -17,6 +17,16 @@ const frontendImagesDir = path.join(__dirname, '..', 'frontend', 'public', 'imag
 
 console.log('Starting custom build for Render deployment...');
 
+// Install ts-node if not already installed (for runtime TypeScript support)
+try {
+  console.log('Checking for ts-node...');
+  require.resolve('ts-node');
+  console.log('ts-node is already installed.');
+} catch (e) {
+  console.log('Installing ts-node...');
+  execSync('npm install --save ts-node typescript @types/node', { stdio: 'inherit' });
+}
+
 // Create dist directory if it doesn't exist
 if (!fs.existsSync(distDir)) {
   console.log(`Creating dist directory: ${distDir}`);
@@ -33,10 +43,29 @@ fs.mkdirSync(imagesDir, { recursive: true });
 fs.mkdirSync(pdfOutputDir, { recursive: true });
 fs.mkdirSync(pdfModulesDir, { recursive: true });
 
-// Copy frontend images to dist/images
+// Create empty folders with .gitkeep to ensure they exist
+const ensureEmptyDirExists = (dir) => {
+  if (!fs.existsSync(dir)) {
+    fs.mkdirSync(dir, { recursive: true });
+  }
+  const gitkeepFile = path.join(dir, '.gitkeep');
+  if (!fs.existsSync(gitkeepFile)) {
+    fs.writeFileSync(gitkeepFile, '');
+  }
+};
+
+ensureEmptyDirExists(path.join(distDir, 'pdf-output'));
+
+// Copy frontend images to dist/images if they exist
 if (fs.existsSync(frontendImagesDir)) {
   console.log('Copying frontend images...');
-  execSync(`cp -R ${frontendImagesDir}/* ${imagesDir}/`);
+  try {
+    execSync(`cp -R ${frontendImagesDir}/* ${imagesDir}/`);
+  } catch (error) {
+    console.warn('Error copying frontend images, may be empty directory:', error.message);
+    // Create a placeholder image if directory is empty
+    ensureEmptyDirExists(imagesDir);
+  }
 }
 
 // Copy pdfHelpers.js if it exists
@@ -45,6 +74,9 @@ const pdfHelpersDest = path.join(pdfModulesDir, 'pdfHelpers.js');
 if (fs.existsSync(pdfHelpersSource)) {
   console.log('Copying pdfHelpers.js...');
   fs.copyFileSync(pdfHelpersSource, pdfHelpersDest);
+} else {
+  console.log('pdfHelpers.js not found, creating an empty file...');
+  fs.writeFileSync(pdfHelpersDest, '// Empty placeholder file\n');
 }
 
 console.log('Custom build completed successfully!'); 

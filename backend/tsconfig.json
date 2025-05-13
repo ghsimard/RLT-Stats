@@ -10,16 +10,16 @@
     "forceConsistentCasingInFileNames": true,
     "moduleResolution": "node",
     "lib": ["es2017", "dom", "esnext"],
-    "typeRoots": ["./node_modules/@types", "./src/types", "./src"],
+    "typeRoots": ["./node_modules/@types", "./src"],
     "noImplicitAny": false,
     "resolveJsonModule": true,
     "allowSyntheticDefaultImports": true,
     "baseUrl": ".",
     "paths": {
-      "*": ["node_modules/*", "src/types/*", "src/*"]
+      "*": ["node_modules/*", "src/*"]
     },
     "noEmitOnError": false
   },
-  "include": ["src/**/*", "src/types/*.d.ts", "src/*.d.ts"],
+  "include": ["src/**/*", "src/*.d.ts"],
   "exclude": ["node_modules"]
 } 

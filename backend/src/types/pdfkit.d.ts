@@ -7,7 +7,7 @@ declare module 'pdfkit' {
     fontSize(size: number): this;
     fillColor(color: string): this;
     fill(): this;
-    text(text: string, x?: number, y?: number, options?: any): this;
+    text(text: string, x?: number | PDFKit.Mixins.TextOptions, y?: number | PDFKit.Mixins.TextOptions, options?: PDFKit.Mixins.TextOptions): this;
     save(): this;
     restore(): this;
     moveTo(x: number, y: number): this;
@@ -72,7 +72,7 @@ export interface CustomPDFKit extends PDFKit.PDFDocument {
   fontSize(size: number): this;
   fillColor(color: string): this;
   fill(): this;
-  text(text: string, x?: number, y?: number, options?: any): this;
+  text(text: string, x?: number | PDFKit.Mixins.TextOptions, y?: number | PDFKit.Mixins.TextOptions, options?: PDFKit.Mixins.TextOptions): this;
   save(): this;
   restore(): this;
   moveTo(x: number, y: number): this;

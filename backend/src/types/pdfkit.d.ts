@@ -24,6 +24,8 @@ declare module 'pdfkit' {
     on(event: string, callback: Function): this;
     closePath(): this;
     rotate(angle: number, options?: { origin?: [number, number] }): this;
+    dash(length?: number, options?: { space?: number }): this;
+    lineWidth(width: number): this;
     
     // Document structure
     addPage(options?: PDFKit.PDFDocumentOptions): this;
@@ -42,9 +44,27 @@ declare module 'pdfkit' {
   // Namespaces for PDFPage and Mixins
   namespace Mixins {
     interface AnnotationOption {}
+    interface TextOptions {
+      align?: string;
+      width?: number;
+      height?: number;
+      indent?: number;
+      lineGap?: number;
+      continued?: boolean;
+    }
+    interface ImageOption {
+      scale?: number;
+      fit?: [number, number];
+      align?: string;
+      valign?: string;
+    }
   }
 
-  interface PDFPage {}
+  interface PDFPage {
+    width: number;
+    height: number;
+    margins: { top: number; left: number; bottom: number; right: number };
+  }
 }
 
 export interface CustomPDFKit extends PDFKit.PDFDocument {
@@ -69,4 +89,6 @@ export interface CustomPDFKit extends PDFKit.PDFDocument {
   on(event: string, callback: Function): this;
   closePath(): this;
   rotate(angle: number, options?: { origin?: [number, number] }): this;
+  dash(length?: number, options?: { space?: number }): this;
+  lineWidth(width: number): this;
 } 

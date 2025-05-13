@@ -20,8 +20,8 @@ if (config.database.connectionString) {
 export const pool = new Pool(
   config.database.connectionString
     ? {
-        connectionString: config.database.connectionString,
-        ssl: config.database.ssl
+  connectionString: config.database.connectionString,
+  ssl: config.database.ssl
       }
     : {
         host: config.database.host,

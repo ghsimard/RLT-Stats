@@ -1,4 +1,4 @@
-import PDFKit from 'pdfkit';
+import * as PDFKit from 'pdfkit';
 
 declare module 'pdfkit' {
   interface PDFDocument {
@@ -92,36 +92,26 @@ declare module 'pdfkit' {
 }
 
 export interface CustomPDFKit extends PDFKit.PDFDocument {
-  rect(x: number, y: number, width: number, height: number): this;
-  fontSize(size: number): this;
-  fillColor(color: string): this;
-  fill(): this;
-  text(text: string, x?: number | PDFKit.Mixins.TextOptions, y?: number | PDFKit.Mixins.TextOptions, options?: PDFKit.Mixins.TextOptions): this;
-  save(): this;
-  restore(): this;
-  moveTo(x: number, y: number): this;
-  arc(x: number, y: number, radius: number, startAngle: number, endAngle: number, anticlockwise?: boolean): this;
-  lineTo(x: number, y: number): this;
-  
-  // Additional methods
-  moveDown(lines?: number): this;
-  font(font: string): this;
-  stroke(): this;
-  strokeColor(color: string): this;
-  pipe(destination: NodeJS.WritableStream): this;
-  end(): void;
-  on(event: string, callback: Function): this;
-  closePath(): this;
-  rotate(angle: number, options?: { origin?: [number, number] }): this;
-  dash(length?: number, options?: { space?: number }): this;
-  lineWidth(width: number): this;
-  
-  // Methods that need specific argument handling
-  circle(...args: any[]): this;
-  underline(...args: any[]): this;
-  
-  // Methods from fortalezasPages.ts that are causing issues (line 460 and 649)
-  circle(x: number, y: number, radius: number): this;
-  underline(x: number, y: number, x2: number, y2: number, options?: any): this;
-  underline(test: string): this;
+  arc(x: number, y: number, radius: number, startAngle: number, endAngle: number, anticlockwise?: boolean): PDFKit.PDFDocument;
+  addPage(): PDFKit.PDFDocument;
+  page: PDFKit.PDFPage;
+  fontSize(size: number): PDFKit.PDFDocument;
+  font(font: string): PDFKit.PDFDocument;
+  text(text: string, x?: number, y?: number, options?: PDFKit.Mixins.TextOptions): PDFKit.PDFDocument;
+  text(text: string, options?: PDFKit.Mixins.TextOptions): PDFKit.PDFDocument;
+  moveDown(lines?: number): PDFKit.PDFDocument;
+  rect(x: number, y: number, width: number, height: number): PDFKit.PDFDocument;
+  fillColor(color: string): PDFKit.PDFDocument;
+  fill(): PDFKit.PDFDocument;
+  save(): PDFKit.PDFDocument;
+  restore(): PDFKit.PDFDocument;
+  moveTo(x: number, y: number): PDFKit.PDFDocument;
+  lineTo(x: number, y: number): PDFKit.PDFDocument;
+  lineWidth(width: number): PDFKit.PDFDocument;
+  translate(x: number, y: number): PDFKit.PDFDocument;
+  widthOfString(text: string): number;
+  y: number;
+  x: number;
+  image(src: string | Buffer, x?: number, y?: number, options?: PDFKit.Mixins.ImageOption): PDFKit.PDFDocument;
+  image(src: string | Buffer, options?: PDFKit.Mixins.ImageOption): PDFKit.PDFDocument;
 } 

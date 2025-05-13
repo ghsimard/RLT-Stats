@@ -24,15 +24,17 @@ async function getEntidadTerritorial(school: string): Promise<string> {
 async function findImagePath(imageName: string): Promise<string | null> {
   // Define potential image paths
   const potentialPaths = [
+    // Project root public/images path (new common path)
+    path.join(__dirname, '..', '..', '..', 'public', 'images', imageName),
+    // Backend public path
+    path.join(__dirname, '..', '..', 'public', 'images', imageName),
     // Frontend build path
     path.join(__dirname, '..', '..', '..', 'frontend', 'build', 'images', imageName),
     // Frontend public path
-    path.join(__dirname, '..', '..', '..', 'frontend', 'public', 'images', imageName),
-    // Root public path
-    path.join(__dirname, '..', '..', '..', '..', 'public', 'images', imageName),
-    // Absolute path directly to the image file
-    path.join('/Users/ghsimard/dev/-- COSMO PROJECT/Stats/frontend/public/images', imageName)
+    path.join(__dirname, '..', '..', '..', 'frontend', 'public', 'images', imageName)
   ];
+
+  console.log(`Looking for image ${imageName} in multiple locations...`);
 
   // Try each path and return the first one that exists
   for (const imgPath of potentialPaths) {
@@ -40,8 +42,11 @@ async function findImagePath(imageName: string): Promise<string | null> {
       if (fs.existsSync(imgPath)) {
         console.log(`Found valid image path: ${imgPath}`);
         return imgPath;
+      } else {
+        console.log(`Image not found at: ${imgPath}`);
       }
     } catch (error) {
+      console.log(`Error checking path ${imgPath}:`, (error as Error).message);
       // Continue to next path
     }
   }

@@ -21,7 +21,7 @@ export const Dashboard: React.FC = () => {
         <Container maxWidth="lg">
           <Box py={4} display="flex" alignItems="center" gap={2}>
             <img 
-              src="/stats/StatsToken012/images/LogoCosmo.png"
+              src="/images/LogoCosmo.png"
               alt="Logo" 
               style={{ 
                 height: '50px',

@@ -30,7 +30,7 @@ export const Navigation: React.FC = () => {
     >
       <Toolbar disableGutters sx={{ px: 0 }}>
         <img 
-          src="/stats/StatsToken012/images/LogoCosmo.png" 
+          src="/images/LogoCosmo.png" 
           alt="COSMO Logo" 
           style={{ 
             height: '40px',

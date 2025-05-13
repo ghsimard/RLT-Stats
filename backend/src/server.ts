@@ -31,6 +31,12 @@ app.use(cors({
 }));
 app.use(express.json());
 
+// Serve static files from the images directory
+app.use('/images', express.static(path.join(__dirname, 'images')));
+
+// Serve static files from the public directory
+app.use(express.static(path.join(__dirname, '..', 'public')));
+
 // Test query to check table access and column names
 pool.query('SELECT column_name FROM information_schema.columns WHERE table_name = \'docentes_form_submissions\'')
   .then((result: QueryResult) => {
@@ -1197,7 +1203,7 @@ async function getGradesDistributionForAllSchools(): Promise<PieChartData[]> {
         FROM docentes_form_submissions d
       ),
       grade_counts AS (
-        SELECT
+      SELECT 
           CASE 
             WHEN clean_grade ILIKE ANY(ARRAY['preescolar', 'primerainfancia', 'primera infancia']) THEN 'Preescolar'
             WHEN clean_grade ~ '^[1-5]$' THEN 'Primaria'
@@ -1205,8 +1211,8 @@ async function getGradesDistributionForAllSchools(): Promise<PieChartData[]> {
             WHEN clean_grade ~ '^1[0-1]$' THEN 'Media'
             ELSE 'Otros'
           END as category,
-          COUNT(*) as count
-        FROM grade_data
+        COUNT(*) as count
+      FROM grade_data
         GROUP BY category
       )
       SELECT 
@@ -1223,11 +1229,11 @@ async function getGradesDistributionForAllSchools(): Promise<PieChartData[]> {
           ELSE 5
         END;
     `;
-    
+
     console.log('Executing grades distribution query for all schools...');
     const result = await pool.query(query);
     console.log('Raw grades distribution result for all schools:', result.rows);
-    
+
     // Define colors for each category
     const categoryConfig: Record<string, { color: string, label: string }> = {
       'Preescolar': { color: '#FF9F40', label: 'Preescolar' }, // Warm Orange
@@ -1245,7 +1251,7 @@ async function getGradesDistributionForAllSchools(): Promise<PieChartData[]> {
         { label: 'No hay datos', value: 1, color: '#CCCCCC' }
       ];
     }
-    
+
     // Transform the data and calculate percentages
     const chartData = result.rows.map(row => {
       console.log(`Processing category ${row.category}: count=${row.count}`);
@@ -1257,7 +1263,7 @@ async function getGradesDistributionForAllSchools(): Promise<PieChartData[]> {
       const config = categoryConfig[normalizedGrade];
       if (!config) {
         console.log(`No config found for grade: ${normalizedGrade}`);
-        return {
+      return {
           label: normalizedGrade || 'Desconocido',
           value: row.count,
           color: '#000000'
@@ -1270,13 +1276,13 @@ async function getGradesDistributionForAllSchools(): Promise<PieChartData[]> {
         color: config.color
       };
     });
-    
+
     console.log('Final chart data for all schools:', chartData);
     return chartData;
   } catch (error) {
     console.error('Error in getGradesDistributionForAllSchools:', error);
     // Return a single "Error" segment instead of empty data
-    return [
+      return [
       { label: 'Error al cargar datos', value: 1, color: '#FF0000' }
     ];
   }
@@ -2514,4 +2520,4 @@ app.get('/api/schools-ranking', async (req, res) => {
       details: error instanceof Error ? error.message : 'Unknown error'
     });
   }
-});
+}); 

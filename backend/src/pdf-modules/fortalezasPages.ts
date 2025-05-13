@@ -2,7 +2,7 @@ import { CustomPDFKit, addHeader } from './pdfUtils';
 import { pool } from '../db';
 import { FrequencyData, FrequencyResult } from '../types';
 // Import the pdfHelpers functions to handle methods with argument count issues
-const { drawCircle, drawUnderline } = require('./pdfHelpers');
+const { drawCircle, drawFill, drawUnderline } = require('./pdfHelpers');
 
 // Get the correct column name based on the section
 const getColumnName = (section: string) => {
@@ -458,8 +458,8 @@ export const generateFortalezasPages = async (doc: CustomPDFKit, school: string)
     }
     
     // Draw merged cell for number column with vertical section title and background color
-    doc.rect(startX, titleStartY, numberWidth, mergedCellHeight)
-       .fill(sectionColor ?? '#000000'); // Use nullish coalescing for fallback
+    doc.rect(startX, titleStartY, numberWidth, mergedCellHeight);
+    drawFill(doc, sectionColor ?? '#000000'); // Use helper function with fallback color
     
     // Save the current graphics state
     doc.save();
@@ -647,8 +647,8 @@ export const generateFortalezasPages = async (doc: CustomPDFKit, school: string)
                .fillColor('#000000');
           } else {
             if (rating === 'S' && value < 50 && value !== -1) {
-              doc.rect(x, currentY, ratingWidth, rowHeight)
-                 .fill('#FFA500'); // Orange color for values < 50%
+              doc.rect(x, currentY, ratingWidth, rowHeight);
+              drawFill(doc, '#FFA500'); // Use helper function for fill with orange color
               doc.fillColor('#000000');  // Black text for better contrast on orange
             }
             

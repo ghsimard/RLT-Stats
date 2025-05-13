@@ -18,6 +18,24 @@ function drawCircle(doc, x, y, radius) {
 }
 
 /**
+ * Helper function for PDFKit fill method with color
+ * @param {object} doc - PDFKit document instance 
+ * @param {string} [color] - Color to fill with
+ * @returns {object} The PDFKit document instance for chaining
+ */
+function drawFill(doc, color) {
+  if (doc) {
+    if (color && typeof doc.fillColor === 'function') {
+      doc.fillColor(color);
+    }
+    if (typeof doc.fill === 'function') {
+      return doc.fill();
+    }
+  }
+  return doc;
+}
+
+/**
  * Helper function for PDFKit underline method
  * @param {object} doc - PDFKit document instance
  * @param {string|number} arg1 - First argument (text or x coordinate)
@@ -40,5 +58,6 @@ function drawUnderline(doc, arg1, arg2, arg3, arg4, options) {
 
 module.exports = {
   drawCircle,
+  drawFill,
   drawUnderline
 }; 

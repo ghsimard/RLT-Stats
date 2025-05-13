@@ -27,7 +27,7 @@ export const config = {
     host: process.env.DB_HOST || 'localhost',
     user: process.env.DB_USER || 'postgres',
     password: process.env.DB_PASSWORD || 'postgres',
-    database: process.env.DB_NAME || 'cosmostats',
+    database: process.env.DB_NAME || 'COSMO_RLT',
     
     // SSL settings for production
     ssl: process.env.NODE_ENV === 'production' ? {

@@ -4,8 +4,8 @@ export const config = {
   },
   cors: {
     origin: process.env.NODE_ENV === 'production' 
-      ? 'https://cosmo-rlt-stats-ui.onrender.com'
-      : ['http://localhost:4000', 'http://localhost']
+      ? ['https://cosmo-rlt-stats-ui.onrender.com', 'https://cosmo-stats-frontend.onrender.com']
+      : ['http://localhost:4000', 'http://localhost:3000', 'http://localhost']
   },
   database: {
     connectionString: process.env.DATABASE_URL || 'postgresql://postgres:postgres@localhost:5432/COSMO_RLT',

@@ -27,6 +27,26 @@ import PhoneIcon from '@mui/icons-material/Phone';
 import { GradesPieChart } from './GradesPieChart';
 import { config } from '../config';
 
+
+const Legend: React.FC = () => (
+  <Box sx={{ mb: 3, display: 'flex', gap: 2, alignItems: 'center', flexWrap: 'wrap' }}>
+    <Typography variant="subtitle1" sx={{ mr: 1 }}>Leyenda:</Typography>
+    <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+      <Chip label="0" color="error" size="small" />
+      <Typography variant="body2">Sin respuestas</Typography>
+    </Box>
+    <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+      <Chip label="1-24" color="warning" size="small" />
+      <Typography variant="body2">Respuestas insuficientes</Typography>
+    </Box>
+    <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+      <Chip label="25+" color="success" size="small" />
+      <Typography variant="body2">Respuestas suficientes</Typography>
+    </Box>
+  </Box>
+);
+
+
 const API_BASE_URL = config.api.baseUrl;
 
 interface SchoolMonitoringData {
@@ -180,10 +200,13 @@ export const MonitoringSurvey: React.FC = () => {
   };
 
   const getSubmissionStatus = (count: number) => {
-    if (count >= 25) {
+    if (count === 0) {
+      return <Chip label={count} color="error" />;
+    } else if (count >= 1 && count <= 24) {
+      return <Chip label={count} color="warning" />;
+    } else {
       return <Chip label={count} color="success" />;
     }
-    return <Chip label={count} color="error" />;
   };
 
   if (loading) {
@@ -213,6 +236,8 @@ export const MonitoringSurvey: React.FC = () => {
               {error}
             </Alert>
           )}
+          
+          <Legend />
           
           <TableContainer component={Paper} sx={{ mb: 4 }}>
             <Table>

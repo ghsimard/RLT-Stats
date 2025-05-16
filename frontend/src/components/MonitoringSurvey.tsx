@@ -157,6 +157,13 @@ export const MonitoringSurvey: React.FC = () => {
   const [error, setError] = useState<string | null>(null);
   const [selectedSchool, setSelectedSchool] = useState<SchoolMonitoringData | null>(null);
 
+  // Calculate totals
+  const totals = schools.reduce((acc, school) => ({
+    docentes: acc.docentes + school.submissions.docentes,
+    estudiantes: acc.estudiantes + school.submissions.estudiantes,
+    acudientes: acc.acudientes + school.submissions.acudientes
+  }), { docentes: 0, estudiantes: 0, acudientes: 0 });
+
   useEffect(() => {
     const fetchData = async () => {
       try {
@@ -236,6 +243,27 @@ export const MonitoringSurvey: React.FC = () => {
               {error}
             </Alert>
           )}
+          
+          {/* Summary Section */}
+          <Paper sx={{ p: 3, mb: 3 }}>
+            <Typography variant="h6" gutterBottom>
+              Resumen Total de Respuestas
+            </Typography>
+            <Box sx={{ display: 'flex', gap: 4, flexWrap: 'wrap' }}>
+              <Box>
+                <Typography variant="subtitle1" color="text.secondary">Docentes</Typography>
+                <Typography variant="h4">{totals.docentes}</Typography>
+              </Box>
+              <Box>
+                <Typography variant="subtitle1" color="text.secondary">Estudiantes</Typography>
+                <Typography variant="h4">{totals.estudiantes}</Typography>
+              </Box>
+              <Box>
+                <Typography variant="subtitle1" color="text.secondary">Acudientes</Typography>
+                <Typography variant="h4">{totals.acudientes}</Typography>
+              </Box>
+            </Box>
+          </Paper>
           
           <Legend />
           

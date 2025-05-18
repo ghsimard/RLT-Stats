@@ -1,3 +1,13 @@
+/**
+ * MonitoringSurvey Component
+ * 
+ * This component displays a monitoring dashboard for school surveys, showing:
+ * - Total response counts for teachers, students, and parents
+ * - Individual school response statistics
+ * - Contact information for each school
+ * - Grade distribution visualization for selected schools
+ */
+
 import { useState, useEffect } from 'react';
 import {
   Container,
@@ -27,25 +37,59 @@ import PhoneIcon from '@mui/icons-material/Phone';
 import { GradesPieChart } from './GradesPieChart';
 import { config } from '../config';
 
+/**
+ * Legend Component
+ * Displays the color-coded legend explaining the response count categories:
+ * - Red (0): No responses
+ * - Yellow (1-24): Insufficient responses
+ * - Green (25+): Sufficient responses
+ */
 
-const Legend: React.FC = () => (
-  <Box sx={{ mb: 3, display: 'flex', gap: 2, alignItems: 'center', flexWrap: 'wrap' }}>
-    <Typography variant="subtitle1" sx={{ mr: 1 }}>Leyenda:</Typography>
-    <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-      <Chip label="0" color="error" size="small" />
-      <Typography variant="body2">Sin respuestas</Typography>
-    </Box>
-    <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-      <Chip label="1-24" color="warning" size="small" />
-      <Typography variant="body2">Respuestas insuficientes</Typography>
-    </Box>
-    <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-      <Chip label="25+" color="success" size="small" />
-      <Typography variant="body2">Respuestas suficientes</Typography>
-    </Box>
-  </Box>
-);
+interface LegendProps {
+  schools: SchoolMonitoringData[];
+}
 
+const Legend: React.FC<LegendProps> = ({ schools }) => {
+  // Calculate counts for each category
+  const counts = schools.reduce((acc, school) => {
+    const totalSubmissions = 
+      school.submissions.docentes + 
+      school.submissions.estudiantes + 
+      school.submissions.acudientes;
+    
+    if (totalSubmissions === 0) {
+      acc.noResponses++;
+    } else if (totalSubmissions >= 1 && totalSubmissions <= 24) {
+      acc.insufficient++;
+    } else {
+      acc.sufficient++;
+    }
+    return acc;
+  }, { noResponses: 0, insufficient: 0, sufficient: 0 });
+
+  return (
+    <Box sx={{ mb: 3, display: 'flex', gap: 2, alignItems: 'center', flexWrap: 'wrap' }}>
+      <Typography variant="subtitle1" sx={{ mr: 1 }}>Leyenda:</Typography>
+      <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+        <Chip label="0" color="error" size="small" />
+        <Typography variant="body2">Sin respuestas ({counts.noResponses} escuelas)</Typography>
+      </Box>
+      <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+        <Chip label="1-24" color="warning" size="small" />
+        <Typography variant="body2">Respuestas insuficientes ({counts.insufficient} escuelas)</Typography>
+      </Box>
+      <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+        <Chip label="25+" color="success" size="small" />
+        <Typography variant="body2">Respuestas suficientes ({counts.sufficient} escuelas)</Typography>
+      </Box>
+    </Box>
+  );
+};
+
+/**
+ * Interface defining the structure of school monitoring data
+ * Contains school information, contact details, and survey submission counts
+ */
 
 const API_BASE_URL = config.api.baseUrl;
 
@@ -71,6 +115,13 @@ interface ContactDialogProps {
   onClose: () => void;
   school: SchoolMonitoringData;
 }
+
+/**
+ * ContactDialog Component
+ * Displays detailed contact information for a selected school
+ * Shows both personal and institutional contact details with visual indication
+ * of the preferred contact method
+ */
 
 const ContactDialog: React.FC<ContactDialogProps> = ({ open, onClose, school }) => {
   const isPersonalPreferred = school.preferredContact?.toLowerCase().includes('personal');
@@ -151,6 +202,17 @@ const ContactDialog: React.FC<ContactDialogProps> = ({ open, onClose, school }) 
   );
 };
 
+/**
+ * Main MonitoringSurvey Component
+ * 
+ * Features:
+ * - Fetches and displays school survey data
+ * - Shows total response counts
+ * - Provides interactive table with school details
+ * - Includes contact information dialog
+ * - Displays grade distribution charts
+ */
+
 export const MonitoringSurvey: React.FC = () => {
   const [schools, setSchools] = useState<SchoolMonitoringData[]>([]);
   const [loading, setLoading] = useState(true);
@@ -206,6 +268,11 @@ export const MonitoringSurvey: React.FC = () => {
     setSelectedSchool(null);
   };
 
+  /**
+   * Returns a color-coded chip based on the number of submissions
+   * @param count - Number of submissions
+   * @returns Chip component with appropriate color and label
+   */
   const getSubmissionStatus = (count: number) => {
     if (count === 0) {
       return <Chip label={count} color="error" />;
@@ -265,7 +332,7 @@ export const MonitoringSurvey: React.FC = () => {
             </Box>
           </Paper>
           
-          <Legend />
+          <Legend schools={schools} />
           
           <TableContainer component={Paper} sx={{ mb: 4 }}>
             <Table>
